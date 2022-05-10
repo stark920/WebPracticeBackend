@@ -37,7 +37,9 @@ const generateJWT = (user, statusCode, res) => {
   res.status(statusCode).send({
     status: true,
     data: {
-      user: user.name,
+      _id: user._id,
+      name: user.name,
+      avatar: user.avatar,
       token,
     },
   });

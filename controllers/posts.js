@@ -13,7 +13,7 @@ const posts = {
       .select({ images: { deleteHash: 0 } })
       .sort({ createdAt: -1 })
       .limit(20)
-      .populate({ path: 'userID', select: 'name avatar' });
+      .populate({ path: 'user', select: 'name avatar' });
 
     res.send({ status: true, data });
   }),
