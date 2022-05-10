@@ -4,6 +4,16 @@ const { validationResult } = require('express-validator');
 const { handleErrorAsync, appError, generateJWT } = require('../service');
 
 const users = {
+  checkToken: handleErrorAsync(async (req, res, next) => {
+    const user = await Users.findById(req.user.id).select('name avatar');
+    res.send({
+      status: true,
+      data: {
+        name: user.name,
+        avatar: user.avatar
+      }
+    })
+  }),
   signUp: handleErrorAsync(async (req, res, next) => {
     const { errors } = validationResult(req);
     if (errors.length > 0) {

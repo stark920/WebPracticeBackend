@@ -6,11 +6,16 @@ const MyImgur = require('../utils/imgur');
 const posts = {
   findPost: handleErrorAsync(async (req, res, next) => {
     if (!req.user) {
-      return appError(400, '帳號不存在', next)
+      return appError(400, '帳號不存在', next);
     }
 
-    const data = await Posts.find().select({'images': {'deleteHash': 0}}).sort({'createdAt': -1}).limit(20);
-    res.send({status: true, data})
+    const data = await Posts.find()
+      .select({ images: { deleteHash: 0 } })
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .populate({ path: 'userID', select: 'name avatar' });
+
+    res.send({ status: true, data });
   }),
   createPost: handleErrorAsync(async (req, res, next) => {
     const { errors } = validationResult(req);
@@ -19,7 +24,7 @@ const posts = {
         status: false,
         message: errors.map((el) => el.msg),
       });
-    } 
+    }
 
     const images = await MyImgur.uploadImage(req.files);
     const data = await Posts.create({
@@ -27,19 +32,16 @@ const posts = {
       content: req.body.content,
       images: images,
     });
-    res.send({status: true, data})
+    res.send({ status: true, data });
   }),
-  async deletePost(req, res) {
-    res.send({status: true, data: req.params.id})
-  },
-  async deleteAllPost(req, res) {
+  deletePost: handleErrorAsync(async (req, res, next) => {
+    res.send({ status: true, data: req.params.id });
+  }),
+  deleteAllPost: handleErrorAsync(async (req, res, next) => {
     const data = await Posts.deleteMany({});
-    res.send({status: true, data: []})
-  },
-  async updatePost(req, res) {},
+    res.send({ status: true, data: [] });
+  }),
+  updatePost: handleErrorAsync(async (req, res, next) => {}),
 };
 
 module.exports = posts;
-
-
-
