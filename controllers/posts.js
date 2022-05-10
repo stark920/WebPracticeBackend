@@ -28,7 +28,7 @@ const posts = {
 
     const images = await MyImgur.uploadImage(req.files);
     const data = await Posts.create({
-      userID: req.user._id,
+      user: req.user._id,
       content: req.body.content,
       images: images,
     });
