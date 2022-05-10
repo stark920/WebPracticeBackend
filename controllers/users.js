@@ -5,13 +5,10 @@ const { handleErrorAsync, appError, generateJWT } = require('../service');
 
 const users = {
   checkToken: handleErrorAsync(async (req, res, next) => {
-    const user = await Users.findById(req.user.id).select('name avatar');
+    const data = await Users.findById(req.user.id).select('name avatar');
     res.send({
       status: true,
-      data: {
-        name: user.name,
-        avatar: user.avatar
-      }
+      data
     })
   }),
   signUp: handleErrorAsync(async (req, res, next) => {
