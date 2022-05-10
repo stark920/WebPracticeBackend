@@ -37,11 +37,13 @@ const users = {
     generateJWT(user, 201, res);
   }),
   getProfile: handleErrorAsync(async (req, res, next) => {
-    const { name, avatar = undefined } = req.user;
-    res.send({
-      status: true,
-      data: { name, avatar },
-    });
+    if (req.params.id === 'isLogin') {
+      const { name, avatar = undefined } = req.user;
+      res.send({
+        status: true,
+        data: { name, avatar },
+      });
+    }
   }),
   updateProfile: handleErrorAsync(async (req, res, next) => {
     const { errors } = validationResult(req);
