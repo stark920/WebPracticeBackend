@@ -1,6 +1,6 @@
 const Posts = require('../models/posts');
 const { validationResult } = require('express-validator');
-const { handleErrorAsync, appError } = require('../service');
+const { handleErrorAsync, appError, validateError } = require('../service');
 const MyImgur = require('../utils/imgur');
 
 const posts = {
@@ -13,7 +13,8 @@ const posts = {
       .select({ images: { deleteHash: 0 } })
       .sort({ createdAt: -1 })
       .limit(20)
-      .populate({ path: 'user', select: 'name avatar' });
+      .populate({ path: 'user', select: 'name avatar' })
+      .populate({ path: 'messages.user', select: 'name avatar' });
 
     res.send({ status: true, data });
   }),
@@ -33,6 +34,32 @@ const posts = {
       images: images,
     });
     res.send({ status: true, data });
+  }),
+  addMessage: handleErrorAsync(async (req, res, next) => {
+    const isError = await validateError(req, res);
+
+    if (isError) return;
+
+    const postID = req.params.postID;
+    const message = {
+      user: req.user._id,
+      content: req.body.content,
+    };
+
+    const data = await Posts.findByIdAndUpdate(
+      postID,
+      {
+        $push: { messages: message },
+      },
+      { new: true }
+    );
+
+    if (!data) appError(400, '無此文章 ID', next);
+
+    res.send({
+      status: true,
+      message: '新增留言成功',
+    });
   }),
   deletePost: handleErrorAsync(async (req, res, next) => {
     res.send({ status: true, data: req.params.id });
