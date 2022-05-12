@@ -19,13 +19,9 @@ const posts = {
     res.send({ status: true, data });
   }),
   createPost: handleErrorAsync(async (req, res, next) => {
-    const { errors } = validationResult(req);
-    if (errors.length > 0) {
-      return res.status(400).send({
-        status: false,
-        message: errors.map((el) => el.msg),
-      });
-    }
+    const isError = await validateError(req, res);
+
+    if (isError) return;
 
     const images = await MyImgur.uploadImage(req.files);
     const data = await Posts.create({
@@ -46,7 +42,7 @@ const posts = {
       content: req.body.content,
     };
 
-    const data = await Posts.findByIdAndUpdate(
+    const result = await Posts.findByIdAndUpdate(
       postID,
       {
         $push: { messages: message },
@@ -54,11 +50,15 @@ const posts = {
       { new: true }
     );
 
-    if (!data) appError(400, '無此文章 ID', next);
+    if (!result) appError(400, '無此文章 ID', next);
+
+    const data = await Posts.findById(postID)
+    .select('messages')
+    .populate({ path: 'messages.user', select: 'name avatar' });
 
     res.send({
       status: true,
-      message: '新增留言成功',
+      data,
     });
   }),
   deletePost: handleErrorAsync(async (req, res, next) => {
