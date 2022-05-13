@@ -12,6 +12,8 @@ const options = {
 
 const MyImgur = {
   uploadImage: async (files) => {
+    if (!files) return;
+    
     const result = [];
 
     for (const file of files) {

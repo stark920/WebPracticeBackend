@@ -19,7 +19,7 @@ const isAuth = handleErrorAsync(async (req, res, next) => {
   // verify token
   const decoded = await new Promise((resolve, reject) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
-      err ? reject(err) : resolve(payload);
+      err ? appError(401, '登入授權異常或已過期', next) : resolve(payload);
     });
   });
 

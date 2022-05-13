@@ -11,12 +11,17 @@ const validations = {
       .bail()
       .trim(),
   ],
-  postID: [param('postID').isMongoId().withMessage('文章 ID 異常')],
+  postID: [
+    param('id')
+      .isMongoId()
+      .withMessage('文章 ID 異常')
+  ],
 };
 
 const postValidator = {
   createPost: [validations.content],
   addMessage: [validations.content, validations.postID],
+  addLike: [validations.postID]
 };
 
 module.exports = postValidator;

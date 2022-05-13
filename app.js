@@ -35,8 +35,11 @@ const DB = process.env.DB.replace('<pwd>', process.env.DB_PWD);
 mongoose.connect(DB).then(() => console.log('DB connect success'));
 
 // routers
-const postsRouter = require('./routes/posts');
+const userRouter = require('./routes/user');
 const usersRouter = require('./routes/users');
+const postRouter = require('./routes/post');
+const postsRouter = require('./routes/posts');
+
 
 // app
 const app = express();
@@ -48,8 +51,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-app.use('/posts', postsRouter);
+app.use('/user', userRouter);
 app.use('/users', usersRouter);
+app.use('/post', postRouter);
+app.use('/posts', postsRouter);
+
 
 // 404 error
 app.use((req, res, next) => {

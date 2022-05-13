@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 
-const validateError = (req, res) => {
+const validateError = (req, res, next) => {
   const { errors } = validationResult(req);
   if (errors.length > 0) {
     res.status(400).send({

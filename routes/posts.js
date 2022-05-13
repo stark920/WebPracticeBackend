@@ -6,17 +6,7 @@ const { isAuth } = require('../service');
 const multer = require('multer');
 const upload = multer();
 
-router.get('/', isAuth, posts.findPost);
-router.post(
-  '/',
-  isAuth,
-  upload.array('image', 10),
-  postValidator.createPost,
-  posts.createPost
-);
-router.post('/:postID', isAuth, postValidator.addMessage, posts.addMessage);
-router.delete('/', posts.deleteAllPost);
-router.delete('/:id', posts.deletePost);
-router.patch('/:id', posts.updatePost);
+router.get('/', isAuth, posts.getAllPost);
+router.delete('/', posts.delAllPost);
 
 module.exports = router;
