@@ -7,23 +7,40 @@ const postSchema = new mongoose.Schema(
       required: true,
       ref: 'Users',
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
     content: {
       type: String,
+      length: {
+        min: 1,
+        max: 1000
+      },
       required: true,
     },
     images: {
-      type: Array,
+      type: [
+        {
+          url: {
+            type: String,
+            required: true,
+          },
+          deleteHash: {
+            type: String,
+            required: true,
+            select: false,
+          },
+        },
+      ],
       default: [],
     },
-    likes: {
-      type: Array,
-      default: [],
+    likesNum: {
+      type: Number,
+      default: 0
     },
-    messages: {
+    likes: [{
+      type: mongoose.Schema.ObjectId,
+      ref: 'Users',
+      default: [],
+    }],
+    comments: {
       type: [
         {
           user: {
@@ -41,6 +58,7 @@ const postSchema = new mongoose.Schema(
     },
   },
   {
+    timestamps: true,
     versionKey: false,
     collection: 'Posts',
   }

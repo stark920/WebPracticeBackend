@@ -4,10 +4,16 @@ const validations = {
   content: [
     body('content')
       .isString()
-      .withMessage('內容 格式異常')
       .bail()
-      .isLength({ min: 1 })
-      .withMessage('內容 至少需要 1 個字元')
+      .isLength({ min: 1, max: 1000 })
+      .bail()
+      .trim(),
+  ],
+  comment: [
+    body('content')
+      .isString()
+      .bail()
+      .isLength({ min: 1, max: 500 })
       .bail()
       .trim(),
   ],
@@ -20,7 +26,7 @@ const validations = {
 
 const postValidator = {
   createPost: [validations.content],
-  addMessage: [validations.content, validations.postID],
+  addComment: [validations.comment, validations.postID],
   addLike: [validations.postID]
 };
 

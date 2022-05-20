@@ -19,11 +19,16 @@ const isAuth = handleErrorAsync(async (req, res, next) => {
   // verify token
   const decoded = await new Promise((resolve, reject) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, payload) => {
-      err ? appError(401, '登入授權異常或已過期', next) : resolve(payload);
+      err ? reject(appError(401, '未授權', next)) : resolve(payload);
     });
   });
 
-  const user = await Users.findById(decoded.id);
+  const user = await Users.findById(decoded.id).select('+isLogin +isActive');
+
+  if (!user || !user.isActive) return appError(401, '此帳號無法使用，請聯繫管理員', next);
+
+  if (!user.isLogin) return appError(401, '請重新登入', next);
+
   req.user = user;
 
   next();
@@ -34,13 +39,13 @@ const generateJWT = (user, statusCode, res) => {
     expiresIn: process.env.JWT_EXPIRES_DAY,
   });
 
+  res.set('Authorization', 'Bearer ' + token);
   res.status(statusCode).send({
     status: true,
     data: {
-      _id: user._id,
       name: user.name,
-      avatar: user.avatar,
-      token,
+      avatar: user?.avatar?.url,
+      gender: user.gender
     },
   });
 };

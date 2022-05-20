@@ -1,86 +1,48 @@
-const { body } = require('express-validator');
-const Users = require('../models/users');
+const { body, param } = require('express-validator');
 
-const validations = {
-  emailUsedCheck: body('email')
+const v = {
+  email: body('email')
     .notEmpty()
-    .withMessage('信箱 未填寫')
     .bail()
     .isString()
-    .withMessage('信箱 格式異常')
     .bail()
     .isEmail()
-    .withMessage('信箱 格式不正確')
     .bail()
-    .toLowerCase()
-    .custom((email) => {
-      return Users.find({ email }).then((user) => {
-        if (user.length > 0) {
-          return Promise.reject('信箱 已經註冊過');
-        }
-      });
-    })
-    .bail()
-    .normalizeEmail(),
-  emailUnusedCheck: body('email')
-    .notEmpty()
-    .withMessage('信箱 未填寫')
-    .bail()
-    .isString()
-    .withMessage('信箱 格式異常')
-    .bail()
-    .isEmail()
-    .withMessage('信箱 格式不正確')
-    .bail()
-    .custom((email) => {
-      return Users.find({ email }).then((user) => {
-        if (user.length === 0) {
-          return Promise.reject('帳號或密碼 錯誤');
-        }
-      });
-    })
-    .bail()
-    .normalizeEmail(),
+    .toLowerCase(),
   password: body('password')
     .notEmpty()
-    .withMessage('密碼 未填寫')
     .bail()
     .isString()
-    .withMessage('密碼 格式異常')
     .bail()
     .custom((value) => value.indexOf(' ') === -1)
-    .withMessage('密碼 不能包含空白')
     .bail()
-    .isLength({ min: 8, max: 20 })
-    .withMessage('密碼 長度限制為 8 ~ 20 個字元'),
+    .isLength({ min: 8, max: 20 }),
+  passwordConfirm: body('passwordConfirm').custom(
+    (value, { req }) => value === req.body.password
+  ),
   name: body('name')
     .notEmpty()
-    .withMessage('暱稱 未填寫')
     .bail()
     .isString()
-    .withMessage('暱稱 格式異常')
     .bail()
-    .isLength({ min: 1, max: 10 })
-    .withMessage('暱稱 長度限制為 1 ~ 10 個字元')
+    .isLength({ min: 2, max: 10 })
     .bail()
     .trim(),
   gender: body('gender')
-    .not()
-    .isEmpty()
-    .withMessage('性別 未填寫')
+    .notEmpty()
     .bail()
-    .isInt({ min: 0, max: 2 })
-    .withMessage('性別 格式異常'),
-  passwordConfirm: body('passwordConfirm')
-    .custom((value, { req }) => value === req.body.password)
-    .withMessage('密碼 兩次輸入的內容不一致'),
+    .custom((value) => ['male', 'female', 'others'].indexOf(value) > -1),
+  userId: param('id').isMongoId(),
 };
 
 const userValidator = {
-  signUp: [validations.emailUsedCheck, validations.password, validations.name],
-  signIn: [validations.emailUnusedCheck, validations.password],
-  updateProfile: [validations.name, validations.gender],
-  updatePassword: [validations.password, validations.passwordConfirm],
+  signUp: [v.email, v.password, v.name],
+  signIn: [v.email, v.password],
+  updateProfile: [v.name, v.gender],
+  updatePassword: [v.password, v.passwordConfirm],
+  getProfile: [v.userId],
+  updateProfileAdmin: [v.userId],
+  deactivateAccount: [v.email, v.password]
 };
 
 module.exports = userValidator;

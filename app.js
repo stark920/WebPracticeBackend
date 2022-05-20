@@ -1,47 +1,64 @@
 const express = require('express');
-const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-
-// CORS !important !important !important
 const cors = require('cors');
-
-// env setting
+const path = require('path');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUI = require('swagger-ui-express');
 const dotenv = require('dotenv');
-
 dotenv.config({ path: './config.env' });
 
-// custom error handler
-const { resErrorDev, resErrorProd } = require('./service');
+// swaggerJsDoc
+const specs = swaggerJsdoc({
+  swaggerDefinition: {
+    info: {
+      title: 'MetaWall API',
+      version: '1.0.0',
+      description: 'This is api document'
+    },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'apiKey',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          in: 'headers',
+          name: 'authorization',
+          description: '請加上 API Token'
+        }
+      }
+    },
+    security: [{
+      bearerAuth: []
+    }]
+  },
+  apis: ['./docs/*.js']
+});
 
-// sync error
+// process error handle
+const { resErrorDev, resErrorProd } = require('./service');
+// sync
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:\n', err);
   process.exit(1);
 });
-
-// async error
-process.on('unhandledRejection', (err, promise) => {
+// async
+process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection！');
-  console.error(err);
+  console.error(reason);
   console.error(promise);
   process.exit(1);
 });
 
-// database
+// DB connection
 const mongoose = require('mongoose');
 const DB = process.env.DB.replace('<pwd>', process.env.DB_PWD);
-
 mongoose.connect(DB).then(() => console.log('DB connect success'));
 
-// routers
-const userRouter = require('./routes/user');
+// routes
 const usersRouter = require('./routes/users');
-const postRouter = require('./routes/post');
 const postsRouter = require('./routes/posts');
 
-
-// app
 const app = express();
 
 app.use(logger('dev'));
@@ -51,13 +68,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-app.use('/user', userRouter);
 app.use('/users', usersRouter);
-app.use('/post', postRouter);
 app.use('/posts', postsRouter);
+app.use('/api-doc', swaggerUI.serve, swaggerUI.setup(specs));
 
-
-// 404 error
 app.use((req, res, next) => {
   res.status(404).send({
     status: false,
@@ -65,24 +79,19 @@ app.use((req, res, next) => {
   });
 });
 
-// 500 error
 app.use((err, req, res, next) => {
-  // modify err
+  // dev
   err.statusCode = err.statusCode || 500;
-
-  // development
   if (process.env.NODE_ENV === 'dev') {
     return resErrorDev(err, res);
   }
-
-  // production: predictable event
-  if (err.name === 'xxxx') {
-    err.message = 'xxxx';
+  // mongoose and multer error
+  if ((err.name === 'ValidationError' || err.name === 'MulterError')) {
+    err.message = '資料錯誤';
     err.isOperational = true;
     return resErrorProd(err, res);
   }
 
-  // production: default
   resErrorProd(err, res);
 });
 
