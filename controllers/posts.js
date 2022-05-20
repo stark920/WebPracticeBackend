@@ -10,12 +10,16 @@ const posts = {
   createPost: handleErrorAsync(async (req, res, next) => {
     const { errors } = validationResult(req);
     if (errors.length > 0) return appError(401, '輸入資料格式錯誤', next);
-
-    const images = await imgur.upload.array(req.files);
+    
+    let images;
+    if (req.files) {
+      images = await imgur.upload.array(req.files);
+    }
+    
     await Posts.create({
       user: req.user._id,
       content: req.body.content,
-      images: images,
+      images: images || [],
     });
 
     res.status(201).send({ status: true, message: '上傳成功' });
