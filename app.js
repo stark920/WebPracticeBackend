@@ -1,98 +1,54 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const helmet = require('helmet');
 const cors = require('cors');
-const path = require('path');
-const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerUI = require('swagger-ui-express');
 const dotenv = require('dotenv');
+const routes = require('./routes/v1');
+const ApiError = require('./utils/ApiError');
+const errorResponse = require('./service/errorResponse');
+
 dotenv.config({ path: './config.env' });
 
-// swaggerJsDoc
-const specs = swaggerJsdoc({
-  swaggerDefinition: {
-    info: {
-      title: 'MetaWall API',
-      version: '1.0.0',
-      description: 'This is api document'
-    },
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: 'apiKey',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          in: 'headers',
-          name: 'authorization',
-          description: '請加上 API Token'
-        }
-      }
-    },
-    security: [{
-      bearerAuth: []
-    }]
-  },
-  apis: ['./docs/*.js']
-});
-
-// process error handle
-const { resErrorDev, resErrorProd } = require('./service');
-// sync
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:\n', err);
-  process.exit(1);
-});
-// async
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection！');
-  console.error(reason);
-  console.error(promise);
-  process.exit(1);
-});
-
-// DB connection
-const mongoose = require('mongoose');
-const DB = process.env.DB.replace('<pwd>', process.env.DB_PWD);
-mongoose.connect(DB).then(() => console.log('DB connect success'));
-
-// routes
-const usersRouter = require('./routes/users');
-const postsRouter = require('./routes/posts');
+require('./service/handleProcessError');
+require('./connections/mongodb');
 
 const app = express();
 
 app.use(logger('dev'));
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors());
 
-app.use('/users', usersRouter);
-app.use('/posts', postsRouter);
-app.use('/api-doc', swaggerUI.serve, swaggerUI.setup(specs));
+app.use(cors());
+app.options('*', cors());
+
+app.use('/v1', routes);
 
 app.use((req, res, next) => {
-  res.status(404).send({
-    status: false,
-    message: '無此路由',
-  });
+  next(new ApiError(404, '無此路由'));
 });
 
 app.use((err, req, res, next) => {
-  // dev
-  err.statusCode = err.statusCode || 500;
-  if (process.env.NODE_ENV === 'dev') {
-    return resErrorDev(err, res);
+  const customError = err;
+  customError.statusCode = err.statusCode || 500;
+  // mongoose or multer
+  if (err.name === 'ValidationError' || err.name === 'MulterError') {
+    customError.statusCode = 400;
+    customError.message = '傳入資料格式有誤';
+    customError.isOperational = true;
   }
-  // mongoose and multer error
-  if ((err.name === 'ValidationError' || err.name === 'MulterError')) {
-    err.message = '資料錯誤';
-    err.isOperational = true;
-    return resErrorProd(err, res);
+  // imgur
+  if (err.name === 'AxiosError') {
+    customError.statusCode = 400;
+    customError.message = '檔案上傳失敗，請聯繫管理員';
+    customError.isOperational = true;
   }
-
-  resErrorProd(err, res);
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    customError.statusCode = 400;
+    customError.message = '傳入資料非正常 JSON 格式';
+    customError.isOperational = true;
+  }
+  next(errorResponse(customError, res));
 });
 
 module.exports = app;
