@@ -52,12 +52,12 @@ const postController = {
           select: 'name avatar',
         },
       });
-    if (!data) next(new ApiError(401, '查無此文章 ID'));
+    if (!data) return next(new ApiError(401, '查無此文章 ID'));
 
     res.send({ status: true, data });
   },
   async createPost(req, res, next) {
-    if (req.body.images) next(new ApiError(400, 'images 請傳入圖片'));
+    if (req.body.images) return next(new ApiError(400, 'images 請傳入圖片'));
 
     let images;
     if (req.files) {
