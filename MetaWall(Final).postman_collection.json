@@ -1,0 +1,614 @@
+{
+	"info": {
+		"_postman_id": "c0f8563b-f08f-4dfc-9cc2-e8ace3ae18f2",
+		"name": "MetaWall(Final)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19746419"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "註冊會員",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"tester001@gmail.com\",\"password\":\"1234qwer\", \"name\":\"Genos\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{path}}/v1/users/sign_up",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"sign_up"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "登入會員",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"email\":\"tester001@gmail.com\",\"password\":\"1234qwer\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{path}}/v1/users/sign_in",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"sign_in"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users (need token)",
+			"item": [
+				{
+					"name": "重設密碼",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"password\":\"1234qwer\",\"passwordConfirm\": \"1234qwer\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{path}}/v1/users/updatePassword",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"updatePassword"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得個人資料",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{path}}/v1/users/profile",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "更新個人資料",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Genos2",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/Users/genos/Desktop/7c9d33.png"
+								},
+								{
+									"key": "gender",
+									"value": "male",
+									"type": "text"
+								},
+								{
+									"key": "134",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{path}}/v1/users/profile",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得指定用戶資料",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{path}}/v1/users/profile/:userId",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"profile",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "62a4763e0c26e9ee0c9efd36"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "追蹤朋友",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{path}}/v1/users/:userId/follow",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								":userId",
+								"follow"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "62a4763e0c26e9ee0c9efd36"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "退追朋友",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{path}}/v1/users/:userId/unfollow",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								":userId",
+								"unfollow"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "62a4763e0c26e9ee0c9efd36"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得個人追蹤名單",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{path}}/v1/users/following",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"following"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得個人按讚列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{path}}/v1/users/getLikeList",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"getLikeList"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Posts (need token)",
+			"item": [
+				{
+					"name": "取得全部貼文(可帶篩選參數）",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{path}}/v1/posts?sort=hot",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"posts"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "hot",
+									"description": "'hot', 'new' or 'old' (default is  new)"
+								},
+								{
+									"key": "limit",
+									"value": "0",
+									"description": "0~100",
+									"disabled": true
+								},
+								{
+									"key": "skip",
+									"value": "1",
+									"description": "0~100",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得單一貼文",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{path}}/v1/posts/:postId",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"posts",
+								":postId"
+							],
+							"variable": [
+								{
+									"key": "postId",
+									"value": "62a485eca162baeb79bd1965"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "新增貼文",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "content",
+									"value": "TEST3456",
+									"type": "text"
+								},
+								{
+									"key": "images",
+									"description": "png, jpeg, jpg",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "124124",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{path}}/v1/posts",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "新增一則貼文的讚",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{path}}/v1/posts/:postId/like",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"posts",
+								":postId",
+								"like"
+							],
+							"variable": [
+								{
+									"key": "postId",
+									"value": "62a485e4a162baeb79bd1960"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取消一則貼文的讚",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{path}}/v1/posts/:postId/unlike",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"posts",
+								":postId",
+								"unlike"
+							],
+							"variable": [
+								{
+									"key": "postId",
+									"value": "62a485e4a162baeb79bd1960"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "新增一則貼文的留言",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"comment\": \"11122233333\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{path}}/v1/posts/:id/comment",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"posts",
+								":id",
+								"comment"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "62a485eca162baeb79bd1965"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得個人所有貼文列表",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{path}}/v1/posts/user/:userId",
+							"host": [
+								"{{path}}"
+							],
+							"path": [
+								"v1",
+								"posts",
+								"user",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "62a45f51773babc3e3a9fd06"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYTQ1ZjUxNzczYmFiYzNlM2E5ZmQwNiIsImlhdCI6MTY1NDkzOTUxMywiZXhwIjoxNjU1MDI1OTEzfQ.qxKLgm2p0z2CLjbT1-AWpjZaGS1ZbTE1TiLROV0Mwsw",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "path",
+			"value": "http://127.0.0.1:3005",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"key": "path",
+			"value": "https://enigmatic-reef-71098.herokuapp.com",
+			"type": "string"
+		}
+	]
+}
